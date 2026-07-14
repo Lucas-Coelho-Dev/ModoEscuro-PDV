@@ -89,6 +89,8 @@ section, article, main, aside, header, footer, form, fieldset,
 .MuiInputBase-root,
 .MuiOutlinedInput-root,
 .MuiOutlinedInput-notchedOutline,
+.MuiPickersInputBase-sectionsContainer,
+.MuiPickersSectionList-root,
 .v-field__overlay,
 .v-field__loader,
 .v-field__outline,
@@ -99,6 +101,17 @@ section, article, main, aside, header, footer, form, fieldset,
 .dx-texteditor-buttons-container {
     background-color: transparent !important;
     background: transparent !important;
+}
+
+/* =====================================================
+   MATERIAL UI DATE PICKERS (MuiPickers) - Texto branco nos campos de data
+   ===================================================== */
+.MuiPickersInputBase-sectionsContainer *,
+.MuiPickersSectionList-root *,
+.MuiPickersSection-section {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-color: transparent !important;
 }
 
 /* Exceção: elementos com fundo colorido inline (badges/botões) */
