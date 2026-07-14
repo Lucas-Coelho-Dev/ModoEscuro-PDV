@@ -41,6 +41,13 @@ function isMuiIconElement(el) {
     return cls.includes('MuiSvgIcon') || cls.includes('MuiIcon-') || cls.includes('MuiIconButton');
 }
 
+// Verifica se é um botão de toggle do Material UI (Aberto/Fechado)
+function isMuiToggleButton(el) {
+    const cls = el.className;
+    if (!cls || typeof cls !== 'string') return false;
+    return cls.includes('MuiToggleButton-root');
+}
+
 // Verifica se está dentro de um elemento MuiBox-root que possui um SVG (ícone filho)
 function isInsideMuiBox(el) {
     let node = el.parentElement;
@@ -99,6 +106,9 @@ function processElement(el) {
         forceElementInputColors(el);
         return;
     }
+
+    // Pula botões de toggle do Material UI (Aberto/Fechado) - CSS cuida
+    if (isMuiToggleButton(el)) return;
 
     // Pula ícones MUI (CSS já cuida via color:revert)
     if (isMuiIconElement(el)) return;

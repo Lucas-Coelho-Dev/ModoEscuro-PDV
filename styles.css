@@ -285,8 +285,24 @@ tr:hover, tr:hover td { background-color: #2d2d2d !important; }
    6. BOTÕES - Apenas brancos ficam escuros; 
       Os coloridos (roxo, verde, etc.) mantêm fundo original
    ===================================================== */
-button:not([style*="background"]):not(.v-btn--icon),
+button:not([style*="background"]):not(.v-btn--icon):not(.MuiToggleButton-root),
 .btn-default {
     background-color: #2a2a2a !important;
     border-color: #444444 !important;
+}
+
+/* =====================================================
+   7. BOTÕES TOGGLE MATERIAL UI (Aberto / Fechado)
+   ===================================================== */
+.MuiToggleButton-root {
+    background-color: #252525 !important;
+    border: 1px solid #444444 !important;
+    color: #aaaaaa !important;
+    -webkit-text-fill-color: #aaaaaa !important;
+}
+
+.MuiToggleButton-root.Mui-selected {
+    background-color: #d32f2f !important; /* Laranja/Vermelho para o estado Aberto selecionado */
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
