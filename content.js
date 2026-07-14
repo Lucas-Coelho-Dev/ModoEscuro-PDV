@@ -107,6 +107,20 @@ function processElement(el) {
         // Se a cor do texto for muito escura (Lightness < 45%) em fundo agora escuro
         if (l < 45 && colorParsed.a > 0.5) {
             el.style.setProperty('color', LIGHT_TEXT, 'important');
+            // Essencial para campos Vuetify que usam -webkit-text-fill-color
+            el.style.setProperty('-webkit-text-fill-color', LIGHT_TEXT, 'important');
+        }
+    }
+
+    // 2b. Processa -webkit-text-fill-color diretamente (Vuetify sobrescreve com esta propriedade)
+    const webkitFill = el.style.webkitTextFillColor || el.style['-webkit-text-fill-color'];
+    if (webkitFill) {
+        const fillParsed = parseColor(webkitFill);
+        if (fillParsed) {
+            const [h, s, l] = rgbToHsl(fillParsed.r, fillParsed.g, fillParsed.b);
+            if (l < 45 && fillParsed.a > 0.5) {
+                el.style.setProperty('-webkit-text-fill-color', LIGHT_TEXT, 'important');
+            }
         }
     }
 

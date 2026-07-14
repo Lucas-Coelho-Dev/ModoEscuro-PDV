@@ -38,37 +38,103 @@ tr:hover, tr:hover td {
 }
 
 /* 3. Inputs, Textareas e Selects */
-input, select, textarea, .form-control, [class*="input"], [class*="select"] {
+input, select, textarea, .form-control {
     background-color: #252525 !important;
     color: #ffffff !important;
     border: 1px solid #444444 !important;
 }
 
-/* Rótulos de campos (Labels) - inclui os floated labels de formulário */
+/* ======================================================
+   CORREÇÃO PRINCIPAL: Todos os textos e fundos de campos
+   Vuetify (v-text-field, v-select, v-autocomplete, etc.)
+   ====================================================== */
+
+/* Fundo dos campos Vuetify */
+.v-field,
+.v-field__field,
+.v-field__input,
+.v-field--variant-outlined,
+.v-field--variant-filled,
+.v-field--variant-underlined,
+.v-field--variant-solo,
+.v-field--variant-plain,
+.v-input__control {
+    background-color: #252525 !important;
+    color: #ffffff !important;
+}
+
+/* Texto digitado / selecionado dentro dos campos */
+.v-field__input,
+.v-field__input input,
+.v-field input,
+.v-field textarea,
+.v-autocomplete__content,
+.v-select__selection,
+.v-select__selection-text,
+.v-combobox__selection,
+.v-combobox__selection-text {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Texto placeholder dos campos */
+.v-field__input::placeholder,
+.v-field input::placeholder,
+.v-field textarea::placeholder {
+    color: #888888 !important;
+    -webkit-text-fill-color: #888888 !important;
+}
+
+/* Rótulos flutuantes (labels que sobem quando o campo está ativo/preenchido) */
+.v-label,
+.v-field-label,
+.v-field__label,
+.v-input__label {
+    color: #aaaaaa !important;
+    -webkit-text-fill-color: #aaaaaa !important;
+}
+
+/* Rótulos de campos (Labels genéricos) */
 label,
 legend,
-.v-label,
 [class*="label"],
 [class*="field-label"],
 [class*="input-label"],
-[class*="floating"],
-[class*="placeholder"],
 fieldset > span,
 fieldset > legend,
 fieldset > label {
     color: #aaaaaa !important;
 }
 
-/* Textos dentro de campos de formulário específicos (Validade, Atendente, Equipe, etc.) */
-fieldset span,
-fieldset div,
-.v-text-field input,
-.v-select__selection,
-.v-select__selection-text,
-.v-field__input,
-.v-field__field,
-.v-field__label {
-    color: #e0e0e0 !important;
+/* Ícones dentro dos campos (append/prepend) */
+.v-field__append-inner,
+.v-field__prepend-inner,
+.v-input__append,
+.v-input__prepend {
+    color: #888888 !important;
+}
+
+/* Borda dos campos Vuetify */
+.v-field__outline,
+.v-field__outline__start,
+.v-field__outline__end,
+.v-field__outline__notch {
+    border-color: #444444 !important;
+}
+
+/* Dropdown/Menu dos selects (quando abre a lista) */
+.v-overlay__content,
+.v-menu > .v-overlay__content,
+.v-list,
+.v-list-item,
+.v-list-item-title {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+}
+
+.v-list-item:hover,
+.v-list-item--active {
+    background-color: #333333 !important;
 }
 
 /* 4. Forçar elementos de texto originalmente pretos/escuros a ficarem claros */
@@ -85,26 +151,26 @@ fieldset div,
 [style*="color: rgba(0, 0, 0"],
 [style*="color: rgb(33"],
 [style*="color: rgb(34"],
-[style*="color: rgb(51"] {
+[style*="color: rgb(51"],
+[style*="-webkit-text-fill-color: rgb(0"],
+[style*="-webkit-text-fill-color: black"] {
     color: #e0e0e0 !important;
+    -webkit-text-fill-color: #e0e0e0 !important;
 }
 
-/* Garante que spans e divs com cor escura aplicada inline também fiquem claros */
-span[style*="color"],
-div[style*="color"],
-p[style*="color"] {
-    color: inherit;
-}
-
-span[style*="color: rgb(0"],
-div[style*="color: rgb(0"],
-span[style*="color: #0"],
-div[style*="color: #0"] {
-    color: #e0e0e0 !important;
+/* Fundos brancos/claros inline */
+[style*="background-color: white"], 
+[style*="background-color: rgb(255, 255, 255)"], 
+[style*="background-color: #fff"], 
+[style*="background-color: #ffffff"],
+[style*="background: white"],
+[style*="background: #fff"],
+[style*="background: #ffffff"] {
+    background-color: #252525 !important;
+    background: #252525 !important;
 }
 
 /* 5. Preservação dos Botões Originais */
-/* Não modificamos os fundos dos botões coloridos para manter a identidade original */
 .btn-primary, button[type="submit"], [class*="purple"] {
     /* Sem modificação de fundo para manter o roxo original */
 }
