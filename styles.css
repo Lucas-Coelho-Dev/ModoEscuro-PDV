@@ -47,6 +47,31 @@ svg, svg *, path, circle, rect, line, polyline, polygon, ellipse {
 }
 
 /* =====================================================
+   REGRA NUCLEAR DE FUNDO: qualquer div/section/article/main
+   que tenha fundo branco ou cinza claro → escuro.
+   Cobre a "Barra de pesquisa" e outros containers brancos.
+   ===================================================== */
+div, section, article, main, aside, header, footer,
+form, fieldset, li, ul, ol,
+[class*="panel"], [class*="Panel"],
+[class*="search"], [class*="Search"],
+[class*="filter"], [class*="Filter"],
+[class*="card"], [class*="Card"],
+[class*="box"], [class*="Box"],
+[class*="container"], [class*="Container"],
+[class*="wrapper"], [class*="Wrapper"],
+[class*="content"], [class*="Content"] {
+    background-color: #1e1e1e !important;
+}
+
+/* Exceção: os que têm fundo colorido inline (badges, botões, ícones) ficam como estão */
+[style*="background-color: rgb("] {
+    background-color: revert !important;
+}
+/* Exceção: o próprio body */
+body { background-color: #121212 !important; }
+
+/* =====================================================
    3. FUNDOS: Brancos/Claros → Escuros
    ===================================================== */
 html, body {

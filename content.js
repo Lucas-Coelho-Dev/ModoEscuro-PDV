@@ -60,8 +60,8 @@ function processElement(el) {
     const bgParsed = parseRGB(cs.backgroundColor);
     if (bgParsed && bgParsed.a > 0.05) {
         const br = brightness(bgParsed.r, bgParsed.g, bgParsed.b);
-        if (br > 160) {
-            // Fundo claro → escurece
+        // Fundo claro (branco OU cinza claro) → escurece
+            if (br > 100) {
             const target = (tag === 'body' || tag === 'html') ? BODY_BG : DARK_BG;
             el.style.setProperty('background-color', target, 'important');
         }
