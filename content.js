@@ -112,7 +112,6 @@ function processElement(el) {
 
     // Pula ícones MUI (CSS já cuida via color:revert)
     if (isMuiIconElement(el)) return;
-    if (isInsideMuiBox(el)) return;
 
     // Pula elementos dentro de fundo colorido (badges de status)
     if (hasVibrantAncestorBg(el)) return;
@@ -136,7 +135,9 @@ function processElement(el) {
         // Texto escuro (não-vivo) → força branco
         if (br < 100 && !isVibrantColor(fgParsed.r, fgParsed.g, fgParsed.b)) {
             el.style.setProperty('color', WHITE_TEXT, 'important');
-            el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
+            if (isEditable) {
+                el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
+            }
         }
     }
 

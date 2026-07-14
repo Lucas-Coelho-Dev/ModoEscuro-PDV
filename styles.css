@@ -12,7 +12,6 @@
    ===================================================== */
 * {
     color: #e0e0e0 !important;
-    -webkit-text-fill-color: #e0e0e0 !important;
     caret-color: #ffffff !important;
 }
 
@@ -115,7 +114,6 @@ section, article, main, aside, header, footer, form, fieldset,
 .MuiPickersSectionList-root *,
 .MuiPickersSection-section {
     color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
     background-color: transparent !important;
 }
 
