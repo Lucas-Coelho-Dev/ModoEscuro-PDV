@@ -242,17 +242,17 @@ function createStyleDebugger() {
             );
         }
 
-        // Coleta informações dos ancestrais (pais)
+        // Coleta informações de TODOS os ancestrais (pais) até o HTML
         const parentsInfo = [];
         let curr = el.parentElement;
         let depth = 0;
-        while (curr && depth < 3) {
+        while (curr && curr !== document.documentElement && depth < 10) {
             const currCs = window.getComputedStyle(curr);
             const classFirst = curr.className && typeof curr.className === 'string' ? curr.className.split(' ')[0] : 'sem-classe';
             parentsInfo.push(
-                `<div style="padding-left: 10px; color: #aaa;">` +
+                `<div style="padding-left: 10px; color: #aaa; font-size: 10px;">` +
                 `↑ <b>${curr.tagName.toLowerCase()}.${classFirst}</b>: ` +
-                `bg=${currCs.backgroundColor} op=${currCs.opacity} vis=${currCs.visibility}` +
+                `bg=${currCs.backgroundColor} c=${currCs.color} op=${currCs.opacity}` +
                 `</div>`
             );
             curr = curr.parentElement;
