@@ -77,14 +77,32 @@ html, body {
     background-color: #1a1a1a !important;
 }
 
-/* Labels flutuantes do Vuetify (Código da loja, Sistema, Atendente, etc.) */
+/* Labels flutuantes do Vuetify - TODOS os estados */
+/* Cobre: normal, ativo, focado, flutuando, com cor primária */
 .v-label,
 .v-field-label,
 .v-field__label,
-.v-input__label {
+.v-input__label,
+.v-field .v-label,
+.v-field .v-field-label,
+.v-text-field .v-label,
+.v-select .v-label,
+.v-autocomplete .v-label,
+.v-combobox .v-label,
+/* Estado ativo/focado (quando o campo está selecionado) */
+.v-field--active .v-label,
+.v-field--focused .v-label,
+.v-field--dirty .v-label,
+.v-label--active,
+.v-label--floating {
     color: #aaaaaa !important;
     -webkit-text-fill-color: #aaaaaa !important;
     opacity: 1 !important;
+}
+
+/* Sobrescreve variável CSS do Vuetify que define a cor primária (roxo/teal) */
+:root {
+    --v-field-label-color: #aaaaaa !important;
 }
 
 /* Campos de formulário Vuetify */
