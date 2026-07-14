@@ -181,6 +181,56 @@ const observer = new MutationObserver((mutations) => {
     }
 });
 
+// Floating style debugger para diagnosticar o problema de cor na tela do usuário
+function createStyleDebugger() {
+    // Evita duplicar
+    if (document.getElementById('dark-theme-debugger')) return;
+    
+    const dbg = document.createElement('div');
+    dbg.id = 'dark-theme-debugger';
+    dbg.style.cssText = `
+        position: fixed !important;
+        bottom: 15px !important;
+        right: 15px !important;
+        background: rgba(30, 30, 30, 0.95) !important;
+        color: #00ff00 !important;
+        border: 2px solid #7c3aed !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        font-family: Consolas, monospace !important;
+        font-size: 11px !important;
+        z-index: 10000000 !important;
+        max-width: 320px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
+        pointer-events: none !important;
+        line-height: 1.4 !important;
+    `;
+    dbg.innerHTML = 'Clique em um campo de texto para ver o estilo';
+    document.body.appendChild(dbg);
+
+    const updateDbg = () => {
+        const el = document.activeElement;
+        if (!el || el === document.body) {
+            dbg.innerHTML = 'Foque em um campo para ver o estilo';
+            return;
+        }
+        const cs = window.getComputedStyle(el);
+        dbg.innerHTML = `
+            <b style="color: #fff">TAG:</b> ${el.tagName.toLowerCase()}<br>
+            <b style="color: #fff">CLASSES:</b> ${el.className || 'nenhuma'}<br>
+            <b style="color: #fff">COLOR:</b> <span style="color: #fff">${cs.color}</span><br>
+            <b style="color: #fff">WEBKIT-FILL:</b> <span style="color: #fff">${cs.webkitTextFillColor || 'none'}</span><br>
+            <b style="color: #fff">BG-COLOR:</b> <span style="color: #fff">${cs.backgroundColor}</span><br>
+            <b style="color: #fff">CARET-COLOR:</b> <span style="color: #fff">${cs.caretColor || 'none'}</span><br>
+            <b style="color: #fff">OPACITY:</b> ${cs.opacity}<br>
+            <b style="color: #fff">DISPLAY:</b> ${cs.display}
+        `;
+    };
+
+    document.addEventListener('focusin', updateDbg, true);
+    document.addEventListener('input', updateDbg, true);
+}
+
 function init() {
     sweep(document.documentElement);
     observer.observe(document.documentElement, {
@@ -209,6 +259,9 @@ function init() {
     document.addEventListener('focusin', handleEvent, true);
     document.addEventListener('input', handleEvent, true);
     document.addEventListener('keydown', handleEvent, true);
+
+    // Inicializa o debugger visual
+    setTimeout(createStyleDebugger, 1000);
 }
 
 if (document.readyState === 'loading') {
