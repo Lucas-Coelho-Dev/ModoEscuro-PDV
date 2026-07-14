@@ -1,0 +1,78 @@
+/* 
+   ====================================================
+   PDVNet - Tema Escuro Híbrido (CSS de Alta Compatibilidade)
+   ====================================================
+*/
+
+/* 1. Reset Global de Fundos e Textos Escuros */
+html, body {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 2. Tabelas e Grid de Dados */
+table, .table, [class*="table"], [class*="grid"] {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #2d2d2d !important;
+}
+
+/* Importante: Células transparentes para mostrar o fundo da linha tr */
+th, td, tr > th, tr > td {
+    background-color: transparent !important;
+    border-color: #2d2d2d !important;
+    color: #cbd5e1 !important;
+}
+
+/* Zebra striping nas linhas */
+tr:nth-child(odd) {
+    background-color: #181818 !important;
+}
+
+tr:nth-child(even) {
+    background-color: #222222 !important;
+}
+
+tr:hover, tr:hover td {
+    background-color: #2d2d2d !important;
+}
+
+/* 3. Inputs, Textareas e Selects */
+input, select, textarea, .form-control, [class*="input"], [class*="select"] {
+    background-color: #252525 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444 !important;
+}
+
+/* Estilos de Rótulos (Labels) */
+label, [class*="label"], legend, .v-label {
+    color: #aaaaaa !important;
+}
+
+/* 4. Forçar elementos de texto originalmente pretos/escuros a ficarem claros */
+[style*="color: black"], 
+[style*="color: rgb(0, 0, 0)"], 
+[style*="color: #000000"], 
+[style*="color: #000"], 
+[style*="color: #333333"], 
+[style*="color: #333"] {
+    color: #e0e0e0 !important;
+}
+
+/* 5. Preservação dos Botões Originais */
+/* Não modificamos os fundos dos botões coloridos para manter a identidade original */
+.btn-primary, button[type="submit"], [class*="purple"] {
+    /* Sem modificação de fundo para manter o roxo original */
+}
+
+/* Apenas botões brancos padrão ficam escuros */
+.btn-default, button:not([class*="primary"]):not([class*="purple"]):not([style*="background"]) {
+    background-color: #252525 !important;
+    border-color: #444444 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Mantém os botões outline (com borda roxa) escuros por dentro */
+button[class*="outline"], .btn-outline {
+    background-color: #1e1e1e !important;
+}

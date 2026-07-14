@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "PDVNet Dark Theme",
+  "version": "1.0",
+  "description": "Modo Escuro Local para o sistema PDVNet Chamados.",
+  "content_scripts": [
+    {
+      "matches": ["*://app.pdvnet.com.br/*"],
+      "css": ["styles.css"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": []
+}
