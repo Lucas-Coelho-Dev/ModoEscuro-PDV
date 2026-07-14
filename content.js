@@ -39,6 +39,27 @@ function isVibrantColor(r, g, b) {
     return saturation > 0.35; // saturação alta = cor viva
 }
 
+// Verifica se o elemento ou algum ancestral próximo tem fundo colorido/vibrante
+// Usado para preservar ícones dentro de círculos coloridos (coluna "Tipo")
+function hasVibrantBackground(el) {
+    let node = el;
+    let depth = 0;
+    while (node && depth < 5) {
+        const cs = window.getComputedStyle(node);
+        const bg = parseRGB(cs.backgroundColor);
+        if (bg && bg.a > 0.5) {
+            const br = brightness(bg.r, bg.g, bg.b);
+            // Fundo com brilho médio (nem preto, nem branco) e saturado = badge colorido
+            if (br > 30 && br < 220 && isVibrantColor(bg.r, bg.g, bg.b)) {
+                return true;
+            }
+        }
+        node = node.parentElement;
+        depth++;
+    }
+    return false;
+}
+
 function processElement(el) {
     if (!el || !el.tagName) return;
     const tag = el.tagName.toLowerCase();
@@ -61,6 +82,10 @@ function processElement(el) {
     }
 
     // --- TEXTO ---
+    // Se o elemento ou um pai próximo tem fundo colorido (ex: círculo de ícone),
+    // NÃO alteramos a cor do texto/ícone para preservar a aparência original.
+    if (hasVibrantBackground(el)) return;
+
     const fgParsed = parseRGB(cs.color);
     if (fgParsed) {
         const br = brightness(fgParsed.r, fgParsed.g, fgParsed.b);

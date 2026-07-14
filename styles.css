@@ -16,6 +16,20 @@
 }
 
 /* =====================================================
+   EXCEÇÃO CRÍTICA: Elementos dentro de badges/círculos coloridos
+   mantêm a cor original (ícones da coluna "Tipo", status chips, etc.)
+   O JS (hasVibrantBackground) também cobre casos dinâmicos.
+   ===================================================== */
+.v-avatar *, .v-chip *, .v-badge *,
+[class*="avatar"] *, [class*="chip"] *, [class*="badge"] *,
+[class*="icon-wrapper"] *, [class*="icon-circle"] *,
+[style*="background-color: rgb"] *:not(span):not(div),
+.v-btn--icon * {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* =====================================================
    2. EXCEÇÕES: Elementos que devem manter cor própria
    ===================================================== */
 
