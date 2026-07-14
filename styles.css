@@ -54,9 +54,14 @@ html, body {
     color: #e0e0e0 !important;
 }
 
-/* Containers, cards, painéis */
+/* App wrapper principal — cobre o fundo cinza na tela de detalhes */
+#app,
+[data-app],
+[id="app"],
 .v-application,
+.v-application__wrap,
 .v-main,
+.v-main__wrap,
 .v-card,
 .v-sheet,
 .v-container,
@@ -67,8 +72,19 @@ html, body {
 .v-toolbar,
 [class*="v-sheet"],
 [class*="v-card"],
-[class*="v-app"] {
+[class*="v-app"],
+[class*="v-main"] {
     background-color: #1a1a1a !important;
+}
+
+/* Labels flutuantes do Vuetify (Código da loja, Sistema, Atendente, etc.) */
+.v-label,
+.v-field-label,
+.v-field__label,
+.v-input__label {
+    color: #aaaaaa !important;
+    -webkit-text-fill-color: #aaaaaa !important;
+    opacity: 1 !important;
 }
 
 /* Campos de formulário Vuetify */
