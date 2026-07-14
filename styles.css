@@ -48,7 +48,7 @@ svg, svg *, path, circle, rect, line, polyline, polygon, ellipse {
    color:revert devolve a cor original definida pelo MUI theme.
    Funciona porque .MuiBox-root tem especificidade maior que *.
    ===================================================== */
-.MuiBox-root,
+.MuiBox-root:has(svg),
 .MuiSvgIcon-root,
 [class*="MuiSvgIcon-"],
 [class*="MuiIcon-"],

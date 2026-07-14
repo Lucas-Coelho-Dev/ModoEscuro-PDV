@@ -1,42 +1,82 @@
 /**
- * PDVNet Dark Theme - Engine Nuclear
- * 
- * Estratégia: Lê a cor COMPUTADA real de cada elemento.
- * Se o texto for escuro e o fundo for escuro → força o texto para branco.
- * Se o fundo for claro → força para escuro.
- * Ignora SVG, botões com cores vivas (roxo, verde, etc.).
+ * PDVNet Dark Theme - Engine Clean & Robust
+ *
+ * Responsável por forçar cor de texto legível e fundos escuros dinâmicos.
+ * Bypassa exclusões para qualquer elemento editável (input, textarea, contenteditable, role=textbox).
  */
 
 const DARK_BG      = '#252525';
-const DARKER_BG    = '#1a1a1a';
 const BODY_BG      = '#121212';
 const WHITE_TEXT   = '#e0e0e0';
-const DIM_TEXT     = '#aaaaaa';
-const BORDER_COLOR = '#444444';
 
-// Tags que nunca modificamos
+// Tags estruturais que nunca modificamos
 const SKIP_TAGS = new Set(['script', 'style', 'link', 'meta', 'head', 'noscript', 'br', 'hr', 'iframe']);
 
-// Parseia "rgb(r, g, b)" ou "rgba(r,g,b,a)" em objeto
+// Parseia cor rgb/rgba
 function parseRGB(str) {
-    if (!str || str === 'transparent' || str === 'initial') return null;
+    if (!str || str === 'transparent' || str === 'initial' || str === 'inherit') return null;
     const m = str.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
     if (!m) return null;
     return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
 }
 
-// Calcula luminosidade (0 = preto, 255 = branco)
+// Calcula luminosidade
 function brightness(r, g, b) {
     return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
-// Verifica se é uma cor "viva" (saturada) - ex: roxo, verde, vermelho
-// Para não modificar textos de badges e ícones coloridos
+// Verifica se é cor saturada/viva (ex: verde, azul, laranja)
 function isVibrantColor(r, g, b) {
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    const saturation = max === 0 ? 0 : (max - min) / max;
-    return saturation > 0.35; // saturação alta = cor viva
+    if (max === 0) return false;
+    const saturation = (max - min) / max;
+    return saturation > 0.30;
+}
+
+// Verifica se é ícone MUI
+function isMuiIconElement(el) {
+    const cls = el.className;
+    if (!cls || typeof cls !== 'string') return false;
+    return cls.includes('MuiSvgIcon') || cls.includes('MuiIcon-') || cls.includes('MuiIconButton');
+}
+
+// Verifica se está dentro de um elemento MuiBox-root que possui um SVG (ícone filho)
+function isInsideMuiBox(el) {
+    let node = el.parentElement;
+    for (let i = 0; i < 4; i++) {
+        if (!node) break;
+        const cls = node.className;
+        if (cls && typeof cls === 'string' && cls.includes('MuiBox-root')) {
+            if (node.querySelector('svg')) return true;
+        }
+        node = node.parentElement;
+    }
+    return false;
+}
+
+// Verifica se há fundo colorido/saturado no próprio elemento ou ancestral
+function hasVibrantAncestorBg(el) {
+    let node = el;
+    for (let i = 0; i < 5; i++) {
+        if (!node) break;
+        const cs = window.getComputedStyle(node);
+        const bg = parseRGB(cs.backgroundColor);
+        if (bg && bg.a > 0.5) {
+            const br = brightness(bg.r, bg.g, bg.b);
+            if (br > 25 && br < 225 && isVibrantColor(bg.r, bg.g, bg.b)) return true;
+        }
+        node = node.parentElement;
+    }
+    return false;
+}
+
+// Força cores em inputs/textareas de forma persistente
+function forceElementInputColors(el) {
+    if (!el) return;
+    el.style.setProperty('color', '#ffffff', 'important');
+    el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+    el.style.setProperty('caret-color', '#ffffff', 'important');
 }
 
 function processElement(el) {
@@ -47,12 +87,25 @@ function processElement(el) {
     // Nunca mexe em SVG interno
     if (el.closest && el.closest('svg')) return;
 
-    // Nunca mexe em elementos MUI de ícone (CSS cuida via color:revert)
-    const cls = el.className;
-    if (cls && typeof cls === 'string' &&
-        (cls.includes('MuiBox-root') || cls.includes('MuiSvgIcon') || cls.includes('MuiIcon-'))) {
+    // Detecta se é um campo de texto/edição
+    const isEditable = tag === 'input' || 
+                       tag === 'textarea' || 
+                       el.hasAttribute('contenteditable') || 
+                       el.getAttribute('role') === 'textbox' ||
+                       el.classList.contains('v-field__input') ||
+                       el.classList.contains('dx-texteditor-input');
+
+    if (isEditable) {
+        forceElementInputColors(el);
         return;
     }
+
+    // Pula ícones MUI (CSS já cuida via color:revert)
+    if (isMuiIconElement(el)) return;
+    if (isInsideMuiBox(el)) return;
+
+    // Pula elementos dentro de fundo colorido (badges de status)
+    if (hasVibrantAncestorBg(el)) return;
 
     const cs = window.getComputedStyle(el);
 
@@ -60,8 +113,7 @@ function processElement(el) {
     const bgParsed = parseRGB(cs.backgroundColor);
     if (bgParsed && bgParsed.a > 0.05) {
         const br = brightness(bgParsed.r, bgParsed.g, bgParsed.b);
-        // Fundo claro (branco OU cinza claro) → escurece
-            if (br > 100) {
+        if (br > 100) {
             const target = (tag === 'body' || tag === 'html') ? BODY_BG : DARK_BG;
             el.style.setProperty('background-color', target, 'important');
         }
@@ -93,15 +145,17 @@ function processElement(el) {
     }
 }
 
-// Força TODOS os inputs/textareas para texto branco (independente do framework)
+// Varre todos os inputs/textareas para garantir cor branca
 function forceInputColors(root) {
+    if (!root) return;
     const sel = 'input, textarea, [contenteditable], [role="textbox"], .dx-texteditor-input, .v-field__input';
-    const inputs = (root.querySelectorAll || (() => []))
-        .call(root, sel);
+    const inputs = (root.querySelectorAll || (() => [])).call(root, sel);
     for (const el of inputs) {
-        el.style.setProperty('color', '#ffffff', 'important');
-        el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
-        el.style.setProperty('caret-color', '#ffffff', 'important');
+        forceElementInputColors(el);
+    }
+    // Se o próprio root for um input/editable
+    if (root.matches && root.matches(sel)) {
+        forceElementInputColors(root);
     }
 }
 
@@ -113,6 +167,7 @@ function sweep(root) {
     for (let i = 0; i < all.length; i++) processElement(all[i]);
     forceInputColors(root);
 }
+
 // MutationObserver para capturar mudanças dinâmicas
 const observer = new MutationObserver((mutations) => {
     for (const mut of mutations) {
@@ -134,6 +189,26 @@ function init() {
         attributes: true,
         attributeFilter: ['style', 'class']
     });
+
+    // Intercepta eventos de foco e digitação para forçar a cor imediatamente
+    const handleEvent = (e) => {
+        const el = e.target;
+        if (el) {
+            const tag = el.tagName ? el.tagName.toLowerCase() : '';
+            const isEditable = tag === 'input' || 
+                               tag === 'textarea' || 
+                               el.hasAttribute('contenteditable') || 
+                               el.getAttribute('role') === 'textbox' ||
+                               el.classList.contains('v-field__input') ||
+                               el.classList.contains('dx-texteditor-input');
+            if (isEditable) {
+                forceElementInputColors(el);
+            }
+        }
+    };
+    document.addEventListener('focusin', handleEvent, true);
+    document.addEventListener('input', handleEvent, true);
+    document.addEventListener('keydown', handleEvent, true);
 }
 
 if (document.readyState === 'loading') {
@@ -142,10 +217,10 @@ if (document.readyState === 'loading') {
     init();
 }
 
-// Re-varre quando a SPA navega (dados carregados depois)
+// Re-varre quando a SPA navega
 window.addEventListener('load', () => sweep(document.documentElement));
 
-// Re-varre a cada 1.5s nos primeiros 10s de vida da página (dados assíncronos)
+// Re-varre periodicamente
 let sweepCount = 0;
 const interval = setInterval(() => {
     sweep(document.documentElement);
