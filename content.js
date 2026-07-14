@@ -215,13 +215,19 @@ function createStyleDebugger() {
             return;
         }
         const cs = window.getComputedStyle(el);
+        const val = el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea' ? el.value : el.innerText;
         dbg.innerHTML = `
             <b style="color: #fff">TAG:</b> ${el.tagName.toLowerCase()}<br>
             <b style="color: #fff">CLASSES:</b> ${el.className || 'nenhuma'}<br>
+            <b style="color: #fff">VALUE:</b> <span style="color: #ffff00">"${val}"</span><br>
             <b style="color: #fff">COLOR:</b> <span style="color: #fff">${cs.color}</span><br>
             <b style="color: #fff">WEBKIT-FILL:</b> <span style="color: #fff">${cs.webkitTextFillColor || 'none'}</span><br>
             <b style="color: #fff">BG-COLOR:</b> <span style="color: #fff">${cs.backgroundColor}</span><br>
-            <b style="color: #fff">CARET-COLOR:</b> <span style="color: #fff">${cs.caretColor || 'none'}</span><br>
+            <b style="color: #fff">FONT-SIZE:</b> ${cs.fontSize}<br>
+            <b style="color: #fff">LINE-HEIGHT:</b> ${cs.lineHeight}<br>
+            <b style="color: #fff">HEIGHT:</b> ${cs.height}<br>
+            <b style="color: #fff">TEXT-INDENT:</b> ${cs.textIndent}<br>
+            <b style="color: #fff">TEXT-TRANSFORM:</b> ${cs.textTransform}<br>
             <b style="color: #fff">OPACITY:</b> ${cs.opacity}<br>
             <b style="color: #fff">DISPLAY:</b> ${cs.display}
         `;
