@@ -242,6 +242,23 @@ function createStyleDebugger() {
             );
         }
 
+        // Coleta informações dos ancestrais (pais)
+        const parentsInfo = [];
+        let curr = el.parentElement;
+        let depth = 0;
+        while (curr && depth < 3) {
+            const currCs = window.getComputedStyle(curr);
+            const classFirst = curr.className && typeof curr.className === 'string' ? curr.className.split(' ')[0] : 'sem-classe';
+            parentsInfo.push(
+                `<div style="padding-left: 10px; color: #aaa;">` +
+                `↑ <b>${curr.tagName.toLowerCase()}.${classFirst}</b>: ` +
+                `bg=${currCs.backgroundColor} op=${currCs.opacity} vis=${currCs.visibility}` +
+                `</div>`
+            );
+            curr = curr.parentElement;
+            depth++;
+        }
+
         dbg.innerHTML = `
             <b style="color: #fff">TAG:</b> ${el.tagName.toLowerCase()}<br>
             <b style="color: #fff">CLASSES:</b> ${el.className || 'nenhuma'}<br>
@@ -250,9 +267,9 @@ function createStyleDebugger() {
             <b style="color: #fff">WEBKIT-FILL:</b> <span style="color: #fff">${cs.webkitTextFillColor || 'none'}</span><br>
             <b style="color: #fff">BG-COLOR:</b> <span style="color: #fff">${cs.backgroundColor}</span><br>
             <b style="color: #fff">FONT-SIZE:</b> ${cs.fontSize}<br>
-            <b style="color: #fff">LINE-HEIGHT:</b> ${cs.lineHeight}<br>
-            <b style="color: #fff">HEIGHT:</b> ${cs.height}<br>
             <b style="color: #fff">OPACITY:</b> ${cs.opacity}<br>
+            <b style="color: #fff">ANCESTRAIS (Pais):</b><br>
+            ${parentsInfo.join('')}
             <b style="color: #fff">FILHOS (Max 3):</b><br>
             ${childrenInfo.join('') || '<div style="padding-left: 10px; color: #666;">Nenhum filho</div>'}
         `;
