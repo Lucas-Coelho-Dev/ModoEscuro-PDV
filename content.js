@@ -1,61 +1,81 @@
 /**
- * PDVNet Dark Theme - Engine Nuclear
- * 
- * Estratégia: Lê a cor COMPUTADA real de cada elemento.
- * Se o texto for escuro e o fundo for escuro → força o texto para branco.
- * Se o fundo for claro → força para escuro.
- * Ignora SVG, botões com cores vivas (roxo, verde, etc.).
+ * PDVNet Dark Theme - Engine Final (JS-First)
+ *
+ * Responsável por toda lógica de cor de texto.
+ * CSS cuida apenas dos fundos/estrutura.
+ *
+ * Regras:
+ *  - Texto escuro em qualquer elemento → força branco (#e0e0e0)
+ *  - Elemento dentro de fundo colorido/saturado → preserva cor original
+ *  - Elementos MUI de ícone (MuiSvgIcon, MuiBox com ícone) → preserva cor original
+ *  - SVG e internos → nunca modifica
  */
 
-const DARK_BG      = '#252525';
-const DARKER_BG    = '#1a1a1a';
-const BODY_BG      = '#121212';
-const WHITE_TEXT   = '#e0e0e0';
-const DIM_TEXT     = '#aaaaaa';
-const BORDER_COLOR = '#444444';
+const DARK_BG    = '#252525';
+const BODY_BG    = '#121212';
+const WHITE_TEXT = '#e0e0e0';
 
-// Tags que nunca modificamos
-const SKIP_TAGS = new Set(['script', 'style', 'link', 'meta', 'head', 'noscript', 'br', 'hr', 'iframe']);
+// Tags que nunca processamos
+const SKIP_TAGS = new Set([
+    'script', 'style', 'link', 'meta', 'head',
+    'noscript', 'br', 'hr', 'iframe', 'svg', 'path',
+    'circle', 'rect', 'line', 'polyline', 'polygon',
+    'ellipse', 'g', 'defs', 'use', 'symbol'
+]);
 
-// Parseia "rgb(r, g, b)" ou "rgba(r,g,b,a)" em objeto
+// Classes MUI/DX que são wrappers de ícones coloridos — NÃO alterar cor
+const ICON_CLASS_FRAGMENTS = [
+    'MuiSvgIcon',
+    'MuiIcon',
+    'MuiAvatar',
+    'MuiChip',
+    'MuiBadge',
+    'dx-icon',
+    'dx-state-selected',
+];
+
 function parseRGB(str) {
-    if (!str || str === 'transparent' || str === 'initial') return null;
+    if (!str || str === 'transparent' || str === 'initial' || str === 'inherit') return null;
     const m = str.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
     if (!m) return null;
     return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
 }
 
-// Calcula luminosidade (0 = preto, 255 = branco)
 function brightness(r, g, b) {
     return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
-// Verifica se é uma cor "viva" (saturada) - ex: roxo, verde, vermelho
-// Para não modificar textos de badges e ícones coloridos
-function isVibrantColor(r, g, b) {
+// Detecta cor saturada (viva) — ex: laranja, azul, roxo, verde
+function isVibrant(r, g, b) {
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    const saturation = max === 0 ? 0 : (max - min) / max;
-    return saturation > 0.35; // saturação alta = cor viva
+    if (max === 0) return false;
+    const saturation = (max - min) / max;
+    return saturation > 0.30;
 }
 
-// Verifica se o elemento ou algum ancestral próximo tem fundo colorido/vibrante
-// Usado para preservar ícones dentro de círculos coloridos (coluna "Tipo")
-function hasVibrantBackground(el) {
+// Verifica se o elemento tem alguma classe de ícone MUI/DX
+function hasIconClass(el) {
+    const cls = el.className;
+    if (!cls || typeof cls !== 'string') return false;
+    return ICON_CLASS_FRAGMENTS.some(fragment => cls.includes(fragment));
+}
+
+// Verifica se o elemento ou ancestral próximo tem fundo colorido/saturado
+// (círculos de tipo, badges de status, etc.)
+function hasVibrantAncestorBg(el) {
     let node = el;
-    let depth = 0;
-    while (node && depth < 5) {
+    for (let i = 0; i < 6; i++) {
+        if (!node) break;
         const cs = window.getComputedStyle(node);
         const bg = parseRGB(cs.backgroundColor);
         if (bg && bg.a > 0.5) {
             const br = brightness(bg.r, bg.g, bg.b);
-            // Fundo com brilho médio (nem preto, nem branco) e saturado = badge colorido
-            if (br > 30 && br < 220 && isVibrantColor(bg.r, bg.g, bg.b)) {
+            if (br > 25 && br < 225 && isVibrant(bg.r, bg.g, bg.b)) {
                 return true;
             }
         }
         node = node.parentElement;
-        depth++;
     }
     return false;
 }
@@ -63,10 +83,18 @@ function hasVibrantBackground(el) {
 function processElement(el) {
     if (!el || !el.tagName) return;
     const tag = el.tagName.toLowerCase();
+
+    // Pula tags de estrutura/SVG
     if (SKIP_TAGS.has(tag)) return;
 
-    // Nunca mexe em SVG interno
+    // Pula elementos dentro de SVG
     if (el.closest && el.closest('svg')) return;
+
+    // Pula wrappers de ícone MUI/DX
+    if (hasIconClass(el)) return;
+
+    // Pula se está dentro de fundo colorido (círculos de tipo/status)
+    if (hasVibrantAncestorBg(el)) return;
 
     const cs = window.getComputedStyle(el);
 
@@ -75,43 +103,37 @@ function processElement(el) {
     if (bgParsed && bgParsed.a > 0.05) {
         const br = brightness(bgParsed.r, bgParsed.g, bgParsed.b);
         if (br > 160) {
-            // Fundo claro → escurece
             const target = (tag === 'body' || tag === 'html') ? BODY_BG : DARK_BG;
             el.style.setProperty('background-color', target, 'important');
         }
     }
 
-    // --- TEXTO ---
-    // Se o elemento ou um pai próximo tem fundo colorido (ex: círculo de ícone),
-    // NÃO alteramos a cor do texto/ícone para preservar a aparência original.
-    if (hasVibrantBackground(el)) return;
-
+    // --- COR DO TEXTO (computed) ---
     const fgParsed = parseRGB(cs.color);
     if (fgParsed) {
         const br = brightness(fgParsed.r, fgParsed.g, fgParsed.b);
-        // Texto escuro (não-vivo) → força branco
-        if (br < 100 && !isVibrantColor(fgParsed.r, fgParsed.g, fgParsed.b)) {
+        if (br < 100 && !isVibrant(fgParsed.r, fgParsed.g, fgParsed.b)) {
             el.style.setProperty('color', WHITE_TEXT, 'important');
             el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
         }
     }
 
-    // --- -webkit-text-fill-color inline (Vuetify injeta isso) ---
+    // --- -webkit-text-fill-color inline (Vuetify injeta) ---
     const wfill = el.style.webkitTextFillColor;
     if (wfill && wfill !== '' && wfill !== 'inherit') {
         const p = parseRGB(wfill);
         if (p) {
             const br = brightness(p.r, p.g, p.b);
-            if (br < 100 && !isVibrantColor(p.r, p.g, p.b)) {
+            if (br < 100 && !isVibrant(p.r, p.g, p.b)) {
                 el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
             }
-        } else if (wfill === 'black' || wfill === '#000' || wfill === '#000000') {
+        } else if (['black', '#000', '#000000'].includes(wfill.toLowerCase())) {
             el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
         }
     }
 }
 
-// Varre todos os filhos de um nó
+// Varre um nó e todos seus filhos
 function sweep(root) {
     if (!root) return;
     processElement(root);
@@ -119,7 +141,7 @@ function sweep(root) {
     for (let i = 0; i < all.length; i++) processElement(all[i]);
 }
 
-// MutationObserver para capturar mudanças dinâmicas
+// Observa mudanças dinâmicas no DOM
 const observer = new MutationObserver((mutations) => {
     for (const mut of mutations) {
         if (mut.type === 'childList') {
@@ -148,10 +170,9 @@ if (document.readyState === 'loading') {
     init();
 }
 
-// Re-varre quando a SPA navega (dados carregados depois)
 window.addEventListener('load', () => sweep(document.documentElement));
 
-// Re-varre a cada 1.5s nos primeiros 10s de vida da página (dados assíncronos)
+// Re-varre periodicamente para capturar dados carregados via API
 let sweepCount = 0;
 const interval = setInterval(() => {
     sweep(document.documentElement);
