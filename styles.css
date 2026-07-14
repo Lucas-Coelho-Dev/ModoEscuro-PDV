@@ -11,7 +11,7 @@
    1. REGRA GLOBAL: Todo texto vira branco
    ===================================================== */
 * {
-    color: #e0e0e0 !important;
+    color: #e0e0e0;
     caret-color: #ffffff !important;
 }
 
@@ -40,20 +40,6 @@ textarea,
 svg, svg *, path, circle, rect, line, polyline, polygon, ellipse {
     color: inherit !important;
     -webkit-text-fill-color: inherit !important;
-}
-
-/* =====================================================
-   EXCEÇÃO ÍCONES MUI (coluna "Tipo" - MuiBox-root + MuiSvgIcon-root)
-   color:revert devolve a cor original definida pelo MUI theme.
-   Funciona porque .MuiBox-root tem especificidade maior que *.
-   ===================================================== */
-.MuiBox-root:has(svg),
-.MuiSvgIcon-root,
-[class*="MuiSvgIcon-"],
-[class*="MuiIcon-"],
-.MuiIconButton-root {
-    color: revert !important;
-    -webkit-text-fill-color: revert !important;
 }
 
 /* Placeholders ficam mais suaves */
