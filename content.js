@@ -1,187 +1,134 @@
 /**
- * PDVNet Dark Theme - Dynamic Computed Style Engine
- * Analisa as cores reais computadas no navegador e converte elementos claros em escuros,
- * mantendo a legibilidade e a fidelidade da marca.
+ * PDVNet Dark Theme - Engine Nuclear
+ * 
+ * Estratégia: Lê a cor COMPUTADA real de cada elemento.
+ * Se o texto for escuro e o fundo for escuro → força o texto para branco.
+ * Se o fundo for claro → força para escuro.
+ * Ignora SVG, botões com cores vivas (roxo, verde, etc.).
  */
 
-const DARK_BG = '#1e1e1e';
-const DARK_BODY_BG = '#121212';
-const LIGHT_TEXT = '#e0e0e0';
-const LIGHT_BORDER = '#333333';
+const DARK_BG      = '#252525';
+const DARKER_BG    = '#1a1a1a';
+const BODY_BG      = '#121212';
+const WHITE_TEXT   = '#e0e0e0';
+const DIM_TEXT     = '#aaaaaa';
+const BORDER_COLOR = '#444444';
 
-// Converte rgb(r, g, b) ou rgba(r, g, b, a) em objeto numérico
-function parseColor(colorStr) {
-    if (!colorStr) return null;
-    if (colorStr === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
-    const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (m) {
-        return {
-            r: parseInt(m[1]),
-            g: parseInt(m[2]),
-            b: parseInt(m[3]),
-            a: m[4] !== undefined ? parseFloat(m[4]) : 1
-        };
-    }
-    return null;
+// Tags que nunca modificamos
+const SKIP_TAGS = new Set(['script', 'style', 'link', 'meta', 'head', 'noscript', 'br', 'hr', 'iframe']);
+
+// Parseia "rgb(r, g, b)" ou "rgba(r,g,b,a)" em objeto
+function parseRGB(str) {
+    if (!str || str === 'transparent' || str === 'initial') return null;
+    const m = str.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?\s*\)/);
+    if (!m) return null;
+    return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
 }
 
-// Converte RGB em HSL para analisar brilho (Lightness)
-function rgbToHsl(r, g, b) {
-    r /= 255; g /= 255; b /= 255;
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h, s, l = (max + min) / 2;
+// Calcula luminosidade (0 = preto, 255 = branco)
+function brightness(r, g, b) {
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
 
-    if (max === min) {
-        h = s = 0;
-    } else {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-    }
-    return [h * 360, s * 100, l * 100];
+// Verifica se é uma cor "viva" (saturada) - ex: roxo, verde, vermelho
+// Para não modificar textos de badges e ícones coloridos
+function isVibrantColor(r, g, b) {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const saturation = max === 0 ? 0 : (max - min) / max;
+    return saturation > 0.35; // saturação alta = cor viva
 }
 
 function processElement(el) {
-    // Evita reprocessamento se não houver mudanças
-    if (el.hasAttribute('data-dark-processed')) return;
-
+    if (!el || !el.tagName) return;
     const tag = el.tagName.toLowerCase();
-    
-    // Ignora elementos invisíveis/técnicos
-    if (['script', 'style', 'link', 'meta', 'br', 'hr', 'iframe', 'svg', 'path', 'img', 'noscript'].includes(tag)) {
-        return;
+    if (SKIP_TAGS.has(tag)) return;
+
+    // Nunca mexe em SVG interno
+    if (el.closest && el.closest('svg')) return;
+
+    const cs = window.getComputedStyle(el);
+
+    // --- FUNDO ---
+    const bgParsed = parseRGB(cs.backgroundColor);
+    if (bgParsed && bgParsed.a > 0.05) {
+        const br = brightness(bgParsed.r, bgParsed.g, bgParsed.b);
+        if (br > 160) {
+            // Fundo claro → escurece
+            const target = (tag === 'body' || tag === 'html') ? BODY_BG : DARK_BG;
+            el.style.setProperty('background-color', target, 'important');
+        }
     }
 
-    // Ignora botões com cores da marca (ex: roxo, verde). Apenas converte botões totalmente brancos.
-    if (tag === 'button' || el.classList.contains('btn') || el.getAttribute('role') === 'button') {
-        const style = window.getComputedStyle(el);
-        const bg = style.backgroundColor;
-        const bgParsed = parseColor(bg);
-        if (bgParsed && bgParsed.a > 0.1) {
-            const [h, s, l] = rgbToHsl(bgParsed.r, bgParsed.g, bgParsed.b);
-            // Se o botão for branco ou quase branco, deixa escuro
-            if (l > 85) {
-                el.style.setProperty('background-color', '#252525', 'important');
-                el.style.setProperty('color', '#ffffff', 'important');
-                el.style.setProperty('border-color', '#444444', 'important');
+    // --- TEXTO ---
+    const fgParsed = parseRGB(cs.color);
+    if (fgParsed) {
+        const br = brightness(fgParsed.r, fgParsed.g, fgParsed.b);
+        // Texto escuro (não-vivo) → força branco
+        if (br < 100 && !isVibrantColor(fgParsed.r, fgParsed.g, fgParsed.b)) {
+            el.style.setProperty('color', WHITE_TEXT, 'important');
+            el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
+        }
+    }
+
+    // --- -webkit-text-fill-color inline (Vuetify injeta isso) ---
+    const wfill = el.style.webkitTextFillColor;
+    if (wfill && wfill !== '' && wfill !== 'inherit') {
+        const p = parseRGB(wfill);
+        if (p) {
+            const br = brightness(p.r, p.g, p.b);
+            if (br < 100 && !isVibrantColor(p.r, p.g, p.b)) {
+                el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
             }
-        }
-        el.setAttribute('data-dark-processed', 'true');
-        return;
-    }
-
-    const style = window.getComputedStyle(el);
-    if (!style) return;
-
-    // 1. Processa a Cor de Fundo (Background)
-    const bg = style.backgroundColor;
-    const bgParsed = parseColor(bg);
-    
-    if (bgParsed && bgParsed.a > 0.1) {
-        const [h, s, l] = rgbToHsl(bgParsed.r, bgParsed.g, bgParsed.b);
-        // Se o fundo for claro (Lightness > 50%)
-        if (l > 50) {
-            if (tag === 'body' || tag === 'html') {
-                el.style.setProperty('background-color', DARK_BODY_BG, 'important');
-            } else if (tag === 'td') {
-                // Força células de tabela a ficarem transparentes para funcionar o zebra striping do CSS
-                el.style.setProperty('background-color', 'transparent', 'important');
-            } else {
-                el.style.setProperty('background-color', DARK_BG, 'important');
-            }
-        }
-    } else if (tag === 'body' || tag === 'html') {
-        el.style.setProperty('background-color', DARK_BODY_BG, 'important');
-    }
-
-    // 2. Processa a Cor do Texto
-    const color = style.color;
-    const colorParsed = parseColor(color);
-    if (colorParsed) {
-        const [h, s, l] = rgbToHsl(colorParsed.r, colorParsed.g, colorParsed.b);
-        // Se a cor do texto for muito escura (Lightness < 45%) em fundo agora escuro
-        if (l < 45 && colorParsed.a > 0.5) {
-            el.style.setProperty('color', LIGHT_TEXT, 'important');
-            // Essencial para campos Vuetify que usam -webkit-text-fill-color
-            el.style.setProperty('-webkit-text-fill-color', LIGHT_TEXT, 'important');
-        }
-    }
-
-    // 2b. Processa -webkit-text-fill-color diretamente (Vuetify sobrescreve com esta propriedade)
-    const webkitFill = el.style.webkitTextFillColor || el.style['-webkit-text-fill-color'];
-    if (webkitFill) {
-        const fillParsed = parseColor(webkitFill);
-        if (fillParsed) {
-            const [h, s, l] = rgbToHsl(fillParsed.r, fillParsed.g, fillParsed.b);
-            if (l < 45 && fillParsed.a > 0.5) {
-                el.style.setProperty('-webkit-text-fill-color', LIGHT_TEXT, 'important');
-            }
-        }
-    }
-
-    // 3. Processa as Bordas Claras
-    const borderTopColor = style.borderTopColor;
-    const borderParsed = parseColor(borderTopColor);
-    if (borderParsed) {
-        const [h, s, l] = rgbToHsl(borderParsed.r, borderParsed.g, borderParsed.b);
-        // Se a borda for muito clara (Lightness > 70%), suaviza
-        if (l > 70) {
-            el.style.setProperty('border-color', LIGHT_BORDER, 'important');
-        }
-    }
-
-    // Marca como processado
-    el.setAttribute('data-dark-processed', 'true');
-}
-
-// Varre elementos recursivamente
-function processSubtree(node) {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-        processElement(node);
-        const children = node.getElementsByTagName('*');
-        for (let i = 0; i < children.length; i++) {
-            processElement(children[i]);
+        } else if (wfill === 'black' || wfill === '#000' || wfill === '#000000') {
+            el.style.setProperty('-webkit-text-fill-color', WHITE_TEXT, 'important');
         }
     }
 }
 
-// MutationObserver para observar elementos adicionados ou alterados dinamicamente
+// Varre todos os filhos de um nó
+function sweep(root) {
+    if (!root) return;
+    processElement(root);
+    const all = root.querySelectorAll ? root.querySelectorAll('*') : [];
+    for (let i = 0; i < all.length; i++) processElement(all[i]);
+}
+
+// MutationObserver para capturar mudanças dinâmicas
 const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-        if (mutation.type === 'childList') {
-            for (const node of mutation.addedNodes) {
-                processSubtree(node);
-            }
-        } else if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
-            // Se a classe ou estilo inline mudar, permite re-processamento
-            mutation.target.removeAttribute('data-dark-processed');
-            processElement(mutation.target);
+    for (const mut of mutations) {
+        if (mut.type === 'childList') {
+            mut.addedNodes.forEach(node => {
+                if (node.nodeType === 1) sweep(node);
+            });
+        } else if (mut.type === 'attributes') {
+            processElement(mut.target);
         }
     }
 });
 
-// Inicialização
 function init() {
-    processSubtree(document.documentElement);
-    
-    // Inicia a observação no documento inteiro
+    sweep(document.documentElement);
     observer.observe(document.documentElement, {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['class', 'style']
+        attributeFilter: ['style', 'class']
     });
 }
 
-// Executa imediatamente ou após o carregamento da página
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
 }
-window.addEventListener('load', init);
+
+// Re-varre quando a SPA navega (dados carregados depois)
+window.addEventListener('load', () => sweep(document.documentElement));
+
+// Re-varre a cada 1.5s nos primeiros 10s de vida da página (dados assíncronos)
+let sweepCount = 0;
+const interval = setInterval(() => {
+    sweep(document.documentElement);
+    if (++sweepCount >= 7) clearInterval(interval);
+}, 1500);
