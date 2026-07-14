@@ -65,28 +65,47 @@ svg, svg *, path, circle, rect, line, polyline, polygon, ellipse {
 }
 
 /* =====================================================
-   REGRA NUCLEAR DE FUNDO: qualquer div/section/article/main
-   que tenha fundo branco ou cinza claro → escuro.
-   Cobre a "Barra de pesquisa" e outros containers brancos.
+   PAINÉIS, CARDS E CONTAINERS DE BUSCA (Fundos Escuros)
+   Substitui a regra perigosa do "div" que cobria os inputs.
    ===================================================== */
-div, section, article, main, aside, header, footer,
-form, fieldset, li, ul, ol,
-[class*="panel"], [class*="Panel"],
-[class*="search"], [class*="Search"],
-[class*="filter"], [class*="Filter"],
-[class*="card"], [class*="Card"],
-[class*="box"], [class*="Box"],
-[class*="container"], [class*="Container"],
-[class*="wrapper"], [class*="Wrapper"],
-[class*="content"], [class*="Content"] {
+section, article, main, aside, header, footer, form, fieldset,
+[class*="panel" i],
+[class*="search" i],
+[class*="filter" i],
+[class*="card" i],
+[class*="container" i],
+[class*="wrapper" i],
+[class*="content" i],
+.dx-datagrid-filter-row,
+.dx-datagrid-search-panel,
+.MuiPaper-root {
     background-color: #1e1e1e !important;
 }
 
-/* Exceção: os que têm fundo colorido inline (badges, botões, ícones) ficam como estão */
+/* =====================================================
+   TRANSPARÊNCIA CRÍTICA: Impedir que divs e pseudo-elementos
+   de layout fiquem sólidos e cubram os inputs/textareas
+   ===================================================== */
+.MuiInputBase-root,
+.MuiOutlinedInput-root,
+.MuiOutlinedInput-notchedOutline,
+.v-field__overlay,
+.v-field__loader,
+.v-field__outline,
+.v-field__outline__start,
+.v-field__outline__end,
+.v-field__outline__notch,
+.dx-texteditor-container,
+.dx-texteditor-buttons-container {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Exceção: elementos com fundo colorido inline (badges/botões) */
 [style*="background-color: rgb("] {
     background-color: revert !important;
 }
-/* Exceção: o próprio body */
+
 body { background-color: #121212 !important; }
 
 /* =====================================================
