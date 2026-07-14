@@ -109,12 +109,20 @@ section, article, main, aside, header, footer, form, fieldset,
 
 /* =====================================================
    MATERIAL UI DATE PICKERS (MuiPickers) - Texto branco nos campos de data
+   Força posicionamento por cima de qualquer overlay e exibe o texto.
    ===================================================== */
 .MuiPickersInputBase-sectionsContainer *,
 .MuiPickersSectionList-root *,
-.MuiPickersSection-section {
+.MuiPickersSection-section,
+.MuiPickersSectionList-sectionContent,
+.MuiPickersInputBase-sectionContent {
     color: #ffffff !important;
     background-color: transparent !important;
+    position: relative !important;
+    z-index: 99999 !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Exceção: elementos com fundo colorido inline (badges/botões) */
