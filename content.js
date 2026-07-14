@@ -191,95 +191,6 @@ const observer = new MutationObserver((mutations) => {
         }
     }
 });
-
-// Floating style debugger para diagnosticar o problema de cor na tela do usuário
-function createStyleDebugger() {
-    // Evita duplicar
-    if (document.getElementById('dark-theme-debugger')) return;
-    
-    const dbg = document.createElement('div');
-    dbg.id = 'dark-theme-debugger';
-    dbg.style.cssText = `
-        position: fixed !important;
-        bottom: 15px !important;
-        right: 15px !important;
-        background: rgba(30, 30, 30, 0.95) !important;
-        color: #00ff00 !important;
-        border: 2px solid #7c3aed !important;
-        padding: 12px !important;
-        border-radius: 8px !important;
-        font-family: Consolas, monospace !important;
-        font-size: 11px !important;
-        z-index: 10000000 !important;
-        max-width: 320px !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
-        pointer-events: none !important;
-        line-height: 1.4 !important;
-    `;
-    dbg.innerHTML = 'Clique em um campo de texto para ver o estilo';
-    document.body.appendChild(dbg);
-
-    const updateDbg = () => {
-        const el = document.activeElement;
-        if (!el || el === document.body) {
-            dbg.innerHTML = 'Foque em um campo para ver o estilo';
-            return;
-        }
-        const cs = window.getComputedStyle(el);
-        const val = el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea' ? el.value : el.innerText;
-        
-        // Coleta informações dos primeiros 3 filhos para ver se algum tem opacidade 0 ou cor errada
-        const childrenInfo = [];
-        const children = el.querySelectorAll('*');
-        for (let i = 0; i < Math.min(children.length, 3); i++) {
-            const child = children[i];
-            const childCs = window.getComputedStyle(child);
-            const classFirst = child.className && typeof child.className === 'string' ? child.className.split(' ')[0] : 'sem-classe';
-            childrenInfo.push(
-                `<div style="padding-left: 10px; color: #aaa;">` +
-                `• <b>${child.tagName.toLowerCase()}.${classFirst}</b>: ` +
-                `c=${childCs.color} op=${childCs.opacity} bg=${childCs.backgroundColor}` +
-                `</div>`
-            );
-        }
-
-        // Coleta informações de TODOS os ancestrais (pais) até o HTML
-        const parentsInfo = [];
-        let curr = el.parentElement;
-        let depth = 0;
-        while (curr && curr !== document.documentElement && depth < 10) {
-            const currCs = window.getComputedStyle(curr);
-            const classFirst = curr.className && typeof curr.className === 'string' ? curr.className.split(' ')[0] : 'sem-classe';
-            parentsInfo.push(
-                `<div style="padding-left: 10px; color: #aaa; font-size: 10px;">` +
-                `↑ <b>${curr.tagName.toLowerCase()}.${classFirst}</b>: ` +
-                `bg=${currCs.backgroundColor} c=${currCs.color} op=${currCs.opacity}` +
-                `</div>`
-            );
-            curr = curr.parentElement;
-            depth++;
-        }
-
-        dbg.innerHTML = `
-            <b style="color: #fff">TAG:</b> ${el.tagName.toLowerCase()}<br>
-            <b style="color: #fff">CLASSES:</b> ${el.className || 'nenhuma'}<br>
-            <b style="color: #fff">VALUE:</b> <span style="color: #ffff00">"${val}"</span><br>
-            <b style="color: #fff">COLOR:</b> <span style="color: #fff">${cs.color}</span><br>
-            <b style="color: #fff">WEBKIT-FILL:</b> <span style="color: #fff">${cs.webkitTextFillColor || 'none'}</span><br>
-            <b style="color: #fff">BG-COLOR:</b> <span style="color: #fff">${cs.backgroundColor}</span><br>
-            <b style="color: #fff">FONT-SIZE:</b> ${cs.fontSize}<br>
-            <b style="color: #fff">OPACITY:</b> ${cs.opacity}<br>
-            <b style="color: #fff">ANCESTRAIS (Pais):</b><br>
-            ${parentsInfo.join('')}
-            <b style="color: #fff">FILHOS (Max 3):</b><br>
-            ${childrenInfo.join('') || '<div style="padding-left: 10px; color: #666;">Nenhum filho</div>'}
-        `;
-    };
-
-    document.addEventListener('focusin', updateDbg, true);
-    document.addEventListener('input', updateDbg, true);
-}
-
 function init() {
     sweep(document.documentElement);
     observer.observe(document.documentElement, {
@@ -289,7 +200,6 @@ function init() {
         attributeFilter: ['style', 'class']
     });
 
-    // Intercepta eventos de foco e digitação para forçar a cor imediatamente
     const handleEvent = (e) => {
         const el = e.target;
         if (el) {
@@ -308,9 +218,6 @@ function init() {
     document.addEventListener('focusin', handleEvent, true);
     document.addEventListener('input', handleEvent, true);
     document.addEventListener('keydown', handleEvent, true);
-
-    // Inicializa o debugger visual
-    setTimeout(createStyleDebugger, 1000);
 }
 
 if (document.readyState === 'loading') {
