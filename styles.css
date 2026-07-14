@@ -151,6 +151,32 @@ html, body {
 input, select, textarea {
     background-color: #252525 !important;
     border: 1px solid #444 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;   /* cursor de digitação visível */
+}
+
+/* Texto digitado dentro dos campos Vuetify (v-field, v-text-field, etc.) */
+.v-field__input,
+.v-field input,
+.v-field textarea,
+.v-field [contenteditable],
+.v-text-field input,
+.v-text-field textarea,
+.v-textarea textarea,
+.v-combobox input,
+.v-autocomplete input,
+.v-select input {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+}
+
+/* Texto selecionado */
+input::selection, textarea::selection,
+.v-field__input::selection {
+    background-color: #7c3aed !important;
+    color: #ffffff !important;
 }
 
 /* Dropdown aberto (lista de opções) */
