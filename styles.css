@@ -1,11 +1,14 @@
 /* 
    ====================================================
-   PDVNet - Tema Escuro Nuclear + Exceção MUI Icons
+   PDVNet - Tema Escuro Nuclear (Máxima Compatibilidade)
    ====================================================
+   Abordagem: Forçar COR CLARA em todos os textos globalmente,
+   depois proteger apenas elementos específicos que precisam 
+   de cor própria (botões coloridos, badges, ícones SVG).
 */
 
 /* =====================================================
-   1. REGRA NUCLEAR: Todo texto → branco
+   1. REGRA GLOBAL: Todo texto vira branco
    ===================================================== */
 * {
     color: #e0e0e0 !important;
@@ -13,39 +16,62 @@
 }
 
 /* =====================================================
-   EXCEÇÃO CRÍTICA: Ícones MUI (coluna "Tipo" e outros)
-   Usamos "revert" para voltar à cor original da página.
-   Funciona porque .MuiBox-root (0-1-0) > * (0-0-0).
+   2. EXCEÇÕES: Elementos que devem manter cor própria
+   ===================================================== */
+
+/* Ícones SVG preservam sua cor de fill/stroke */
+svg, svg *, path, circle, rect, line, polyline, polygon, ellipse {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+}
+
+/* =====================================================
+   EXCEÇÃO ÍCONES MUI (coluna "Tipo" - MuiBox-root + MuiSvgIcon-root)
+   color:revert devolve a cor original definida pelo MUI theme.
+   Funciona porque .MuiBox-root tem especificidade maior que *.
    ===================================================== */
 .MuiBox-root,
 .MuiSvgIcon-root,
-[class*="MuiSvgIcon"],
+[class*="MuiSvgIcon-"],
 [class*="MuiIcon-"],
-.MuiIconButton-root,
-.MuiAvatar-root,
-.MuiChip-root,
-.MuiBox-root *,
-[class*="MuiSvgIcon"] * {
+.MuiIconButton-root {
     color: revert !important;
     -webkit-text-fill-color: revert !important;
 }
 
-/* Placeholder um pouco mais suave */
-::placeholder {
+/* Placeholders ficam mais suaves */
+::placeholder,
+::-webkit-input-placeholder {
     color: #666666 !important;
     -webkit-text-fill-color: #666666 !important;
 }
 
 /* =====================================================
-   2. FUNDOS GLOBAIS
+   3. FUNDOS: Brancos/Claros → Escuros
    ===================================================== */
 html, body {
     background-color: #121212 !important;
+    color: #e0e0e0 !important;
 }
 
-/* =====================================================
-   3. CAMPOS DE FORMULÁRIO VUETIFY - Fundos
-   ===================================================== */
+/* Containers, cards, painéis */
+.v-application,
+.v-main,
+.v-card,
+.v-sheet,
+.v-container,
+.v-row,
+.v-col,
+.v-app-bar,
+.v-navigation-drawer,
+.v-toolbar,
+[class*="v-sheet"],
+[class*="v-card"],
+[class*="v-app"] {
+    background-color: #1a1a1a !important;
+}
+
+/* Campos de formulário Vuetify */
 .v-field,
 .v-field__field,
 .v-text-field,
@@ -53,91 +79,35 @@ html, body {
 .v-autocomplete,
 .v-combobox,
 .v-input,
-.v-input__control,
+.v-input__control {
+    background-color: #252525 !important;
+}
+
+.v-field--variant-outlined .v-field__outline,
 .v-field--variant-outlined {
     background-color: #252525 !important;
 }
 
+/* Inputs nativos dentro dos componentes Vuetify */
 input, select, textarea {
     background-color: #252525 !important;
     border: 1px solid #444 !important;
 }
 
-/* =====================================================
-   4. TABELAS DevExtreme (dx-datagrid)
-   ===================================================== */
-.dx-datagrid,
-.dx-datagrid-content,
-.dx-datagrid-table,
-.dx-datagrid-headers,
-.dx-datagrid-rowsview,
-.dx-widget,
-[class*="dx-datagrid"],
-[class*="dx-grid"] {
-    background-color: #1e1e1e !important;
-    border-color: #2d2d2d !important;
-}
-
-.dx-datagrid-headers td,
-[class*="dx-header-row"] td {
-    background-color: #151515 !important;
-    border-color: #2d2d2d !important;
-}
-
-.dx-data-row td {
-    border-color: #2d2d2d !important;
-}
-
-.dx-row-odd td, .dx-data-row:nth-child(odd) td {
-    background-color: #1a1a1a !important;
-}
-
-.dx-row-even td, .dx-data-row:nth-child(even) td {
-    background-color: #222222 !important;
-}
-
-.dx-row:hover td {
-    background-color: #2d2d2d !important;
-}
-
-/* =====================================================
-   5. TABELAS GENÉRICAS
-   ===================================================== */
-table { background-color: #1e1e1e !important; border-color: #2d2d2d !important; }
-th    { background-color: #151515 !important; border-color: #2d2d2d !important; }
-td    { background-color: transparent !important; border-color: #2d2d2d !important; }
-tr:nth-child(odd)  { background-color: #1a1a1a !important; }
-tr:nth-child(even) { background-color: #222222 !important; }
-tr:hover, tr:hover td { background-color: #2d2d2d !important; }
-
-/* =====================================================
-   6. DROPDOWN ABERTO
-   ===================================================== */
+/* Dropdown aberto (lista de opções) */
 .v-overlay__content,
+.v-menu__content,
 .v-list,
 .v-list-item,
-.dx-overlay-content,
-.dx-dropdownlist-popup-wrapper {
+.v-autocomplete__content {
     background-color: #2a2a2a !important;
 }
 
-.v-list-item:hover, .dx-state-hover {
+.v-list-item:hover {
     background-color: #333333 !important;
 }
 
-/* =====================================================
-   7. BORDAS VUETIFY
-   ===================================================== */
-.v-field__outline,
-.v-field__outline__start,
-.v-field__outline__end,
-.v-field__outline__notch {
-    border-color: #444444 !important;
-}
-
-/* =====================================================
-   8. FUNDOS BRANCOS INLINE
-   ===================================================== */
+/* Fundos brancos inline (injetados pelo JS do site) */
 [style*="background-color: white"],
 [style*="background-color: rgb(255, 255, 255)"],
 [style*="background-color: #fff"],
@@ -147,4 +117,46 @@ tr:hover, tr:hover td { background-color: #2d2d2d !important; }
 [style*="background: #ffffff"] {
     background-color: #252525 !important;
     background: #252525 !important;
+}
+
+/* =====================================================
+   4. TABELAS
+   ===================================================== */
+table, .table, [class*="table"], [class*="grid"] {
+    background-color: #1e1e1e !important;
+    border-color: #2d2d2d !important;
+}
+
+th, thead th {
+    background-color: #151515 !important;
+    border-bottom: 2px solid #2d2d2d !important;
+}
+
+td {
+    background-color: transparent !important;
+    border-color: #2d2d2d !important;
+}
+
+tr:nth-child(odd)  { background-color: #181818 !important; }
+tr:nth-child(even) { background-color: #222222 !important; }
+tr:hover, tr:hover td { background-color: #2d2d2d !important; }
+
+/* =====================================================
+   5. BORDAS DOS CAMPOS
+   ===================================================== */
+.v-field__outline,
+.v-field__outline__start,
+.v-field__outline__end,
+.v-field__outline__notch {
+    border-color: #444444 !important;
+}
+
+/* =====================================================
+   6. BOTÕES - Apenas brancos ficam escuros; 
+      Os coloridos (roxo, verde, etc.) mantêm fundo original
+   ===================================================== */
+button:not([style*="background"]):not(.v-btn--icon),
+.btn-default {
+    background-color: #2a2a2a !important;
+    border-color: #444444 !important;
 }
