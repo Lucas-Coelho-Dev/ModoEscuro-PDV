@@ -1,34 +1,50 @@
 /* 
    ====================================================
-   PDVNet - Tema Escuro (Versão Final - JS-First)
+   PDVNet - Tema Escuro Nuclear + Exceção MUI Icons
    ====================================================
-   O CSS cuida dos FUNDOS e estrutura.
-   O JS (content.js) cuida de toda lógica de cores de texto,
-   com inteligência para preservar ícones MUI e badges coloridos.
 */
 
 /* =====================================================
-   1. FUNDOS GLOBAIS
+   1. REGRA NUCLEAR: Todo texto → branco
+   ===================================================== */
+* {
+    color: #e0e0e0 !important;
+    -webkit-text-fill-color: #e0e0e0 !important;
+}
+
+/* =====================================================
+   EXCEÇÃO CRÍTICA: Ícones MUI (coluna "Tipo" e outros)
+   Usamos "revert" para voltar à cor original da página.
+   Funciona porque .MuiBox-root (0-1-0) > * (0-0-0).
+   ===================================================== */
+.MuiBox-root,
+.MuiSvgIcon-root,
+[class*="MuiSvgIcon"],
+[class*="MuiIcon-"],
+.MuiIconButton-root,
+.MuiAvatar-root,
+.MuiChip-root,
+.MuiBox-root *,
+[class*="MuiSvgIcon"] * {
+    color: revert !important;
+    -webkit-text-fill-color: revert !important;
+}
+
+/* Placeholder um pouco mais suave */
+::placeholder {
+    color: #666666 !important;
+    -webkit-text-fill-color: #666666 !important;
+}
+
+/* =====================================================
+   2. FUNDOS GLOBAIS
    ===================================================== */
 html, body {
     background-color: #121212 !important;
 }
 
-.v-application,
-.v-main,
-.v-card,
-.v-sheet,
-.v-container,
-.v-app-bar,
-.v-navigation-drawer,
-.v-toolbar,
-[class*="v-sheet"],
-[class*="v-card"] {
-    background-color: #1a1a1a !important;
-}
-
 /* =====================================================
-   2. CAMPOS DE FORMULÁRIO VUETIFY - Fundos
+   3. CAMPOS DE FORMULÁRIO VUETIFY - Fundos
    ===================================================== */
 .v-field,
 .v-field__field,
@@ -48,33 +64,28 @@ input, select, textarea {
 }
 
 /* =====================================================
-   3. TABELAS DevExtreme (dx-datagrid)
+   4. TABELAS DevExtreme (dx-datagrid)
    ===================================================== */
 .dx-datagrid,
 .dx-datagrid-content,
 .dx-datagrid-table,
 .dx-datagrid-headers,
 .dx-datagrid-rowsview,
-.dx-datagrid-header-panel,
 .dx-widget,
 [class*="dx-datagrid"],
 [class*="dx-grid"] {
     background-color: #1e1e1e !important;
     border-color: #2d2d2d !important;
-    color: #e0e0e0 !important;
 }
 
 .dx-datagrid-headers td,
-.dx-datagrid-headers .dx-datagrid-text-content,
 [class*="dx-header-row"] td {
     background-color: #151515 !important;
-    color: #aaaaaa !important;
     border-color: #2d2d2d !important;
 }
 
 .dx-data-row td {
     border-color: #2d2d2d !important;
-    color: #e0e0e0 !important;
 }
 
 .dx-row-odd td, .dx-data-row:nth-child(odd) td {
@@ -90,37 +101,32 @@ input, select, textarea {
 }
 
 /* =====================================================
-   4. TABELAS GENÉRICAS
+   5. TABELAS GENÉRICAS
    ===================================================== */
 table { background-color: #1e1e1e !important; border-color: #2d2d2d !important; }
-th    { background-color: #151515 !important; color: #aaaaaa !important; border-color: #2d2d2d !important; }
-td    { background-color: transparent !important; color: #e0e0e0 !important; border-color: #2d2d2d !important; }
+th    { background-color: #151515 !important; border-color: #2d2d2d !important; }
+td    { background-color: transparent !important; border-color: #2d2d2d !important; }
 tr:nth-child(odd)  { background-color: #1a1a1a !important; }
 tr:nth-child(even) { background-color: #222222 !important; }
 tr:hover, tr:hover td { background-color: #2d2d2d !important; }
 
 /* =====================================================
-   5. DROPDOWN ABERTO (lista de opções)
+   6. DROPDOWN ABERTO
    ===================================================== */
 .v-overlay__content,
-.v-menu__content,
 .v-list,
 .v-list-item,
 .dx-overlay-content,
-.dx-list,
 .dx-dropdownlist-popup-wrapper {
     background-color: #2a2a2a !important;
-    color: #e0e0e0 !important;
 }
 
-.v-list-item:hover,
-.dx-list-item:hover,
-.dx-state-hover {
+.v-list-item:hover, .dx-state-hover {
     background-color: #333333 !important;
 }
 
 /* =====================================================
-   6. BORDAS DOS CAMPOS VUETIFY
+   7. BORDAS VUETIFY
    ===================================================== */
 .v-field__outline,
 .v-field__outline__start,
@@ -130,7 +136,7 @@ tr:hover, tr:hover td { background-color: #2d2d2d !important; }
 }
 
 /* =====================================================
-   7. FUNDOS BRANCOS INLINE (injetados pelo JS do site)
+   8. FUNDOS BRANCOS INLINE
    ===================================================== */
 [style*="background-color: white"],
 [style*="background-color: rgb(255, 255, 255)"],
