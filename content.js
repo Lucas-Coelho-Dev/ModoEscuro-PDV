@@ -93,14 +93,25 @@ function processElement(el) {
     }
 }
 
+// Força TODOS os inputs/textareas para texto branco (independente do framework)
+function forceInputColors(root) {
+    const inputs = (root.querySelectorAll || (() => []))
+        .call(root, 'input, textarea, [contenteditable="true"], .dx-texteditor-input');
+    for (const el of inputs) {
+        el.style.setProperty('color', '#ffffff', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+        el.style.setProperty('caret-color', '#ffffff', 'important');
+    }
+}
+
 // Varre todos os filhos de um nó
 function sweep(root) {
     if (!root) return;
     processElement(root);
     const all = root.querySelectorAll ? root.querySelectorAll('*') : [];
     for (let i = 0; i < all.length; i++) processElement(all[i]);
+    forceInputColors(root);
 }
-
 // MutationObserver para capturar mudanças dinâmicas
 const observer = new MutationObserver((mutations) => {
     for (const mut of mutations) {

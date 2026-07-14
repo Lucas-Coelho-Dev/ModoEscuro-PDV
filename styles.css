@@ -166,7 +166,15 @@ input, select, textarea {
 .v-textarea textarea,
 .v-combobox input,
 .v-autocomplete input,
-.v-select input {
+.v-select input,
+/* DevExtreme inputs (barra de pesquisa, filtros) */
+.dx-texteditor-input,
+.dx-texteditor input,
+.dx-widget input,
+.dx-widget textarea,
+[class*="dx-"] input,
+[class*="dx-"] textarea,
+[class*="dx-texteditor"] input {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     caret-color: #ffffff !important;
