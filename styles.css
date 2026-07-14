@@ -44,9 +44,31 @@ input, select, textarea, .form-control, [class*="input"], [class*="select"] {
     border: 1px solid #444444 !important;
 }
 
-/* Estilos de Rótulos (Labels) */
-label, [class*="label"], legend, .v-label {
+/* Rótulos de campos (Labels) - inclui os floated labels de formulário */
+label,
+legend,
+.v-label,
+[class*="label"],
+[class*="field-label"],
+[class*="input-label"],
+[class*="floating"],
+[class*="placeholder"],
+fieldset > span,
+fieldset > legend,
+fieldset > label {
     color: #aaaaaa !important;
+}
+
+/* Textos dentro de campos de formulário específicos (Validade, Atendente, Equipe, etc.) */
+fieldset span,
+fieldset div,
+.v-text-field input,
+.v-select__selection,
+.v-select__selection-text,
+.v-field__input,
+.v-field__field,
+.v-field__label {
+    color: #e0e0e0 !important;
 }
 
 /* 4. Forçar elementos de texto originalmente pretos/escuros a ficarem claros */
@@ -54,8 +76,30 @@ label, [class*="label"], legend, .v-label {
 [style*="color: rgb(0, 0, 0)"], 
 [style*="color: #000000"], 
 [style*="color: #000"], 
+[style*="color: #111111"],
+[style*="color: #111"],
 [style*="color: #333333"], 
-[style*="color: #333"] {
+[style*="color: #333"],
+[style*="color: #222222"],
+[style*="color: #222"],
+[style*="color: rgba(0, 0, 0"],
+[style*="color: rgb(33"],
+[style*="color: rgb(34"],
+[style*="color: rgb(51"] {
+    color: #e0e0e0 !important;
+}
+
+/* Garante que spans e divs com cor escura aplicada inline também fiquem claros */
+span[style*="color"],
+div[style*="color"],
+p[style*="color"] {
+    color: inherit;
+}
+
+span[style*="color: rgb(0"],
+div[style*="color: rgb(0"],
+span[style*="color: #0"],
+div[style*="color: #0"] {
     color: #e0e0e0 !important;
 }
 
