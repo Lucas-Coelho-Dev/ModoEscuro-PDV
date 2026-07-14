@@ -76,6 +76,11 @@ section, article, main, aside, header, footer, form, fieldset,
 [class*="container" i],
 [class*="wrapper" i],
 [class*="content" i],
+[class*="bar" i],       /* Cobre barra de status, toolbar, etc. */
+[class*="footer" i],    /* Cobre rodapé */
+[class*="bottom" i],    /* Cobre barra inferior */
+[class*="status" i],    /* Cobre barra de status */
+[class*="pager" i],     /* Paginadores */
 .dx-datagrid-filter-row,
 .dx-datagrid-search-panel,
 .MuiPaper-root {

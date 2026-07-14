@@ -123,7 +123,7 @@ function processElement(el) {
     const bgParsed = parseRGB(cs.backgroundColor);
     if (bgParsed && bgParsed.a > 0.05) {
         const br = brightness(bgParsed.r, bgParsed.g, bgParsed.b);
-        if (br > 100) {
+        if (br > 150) {
             const target = (tag === 'body' || tag === 'html') ? BODY_BG : DARK_BG;
             el.style.setProperty('background-color', target, 'important');
         }
@@ -226,6 +226,22 @@ function createStyleDebugger() {
         }
         const cs = window.getComputedStyle(el);
         const val = el.tagName.toLowerCase() === 'input' || el.tagName.toLowerCase() === 'textarea' ? el.value : el.innerText;
+        
+        // Coleta informações dos primeiros 3 filhos para ver se algum tem opacidade 0 ou cor errada
+        const childrenInfo = [];
+        const children = el.querySelectorAll('*');
+        for (let i = 0; i < Math.min(children.length, 3); i++) {
+            const child = children[i];
+            const childCs = window.getComputedStyle(child);
+            const classFirst = child.className && typeof child.className === 'string' ? child.className.split(' ')[0] : 'sem-classe';
+            childrenInfo.push(
+                `<div style="padding-left: 10px; color: #aaa;">` +
+                `• <b>${child.tagName.toLowerCase()}.${classFirst}</b>: ` +
+                `c=${childCs.color} op=${childCs.opacity} bg=${childCs.backgroundColor}` +
+                `</div>`
+            );
+        }
+
         dbg.innerHTML = `
             <b style="color: #fff">TAG:</b> ${el.tagName.toLowerCase()}<br>
             <b style="color: #fff">CLASSES:</b> ${el.className || 'nenhuma'}<br>
@@ -236,10 +252,9 @@ function createStyleDebugger() {
             <b style="color: #fff">FONT-SIZE:</b> ${cs.fontSize}<br>
             <b style="color: #fff">LINE-HEIGHT:</b> ${cs.lineHeight}<br>
             <b style="color: #fff">HEIGHT:</b> ${cs.height}<br>
-            <b style="color: #fff">TEXT-INDENT:</b> ${cs.textIndent}<br>
-            <b style="color: #fff">TEXT-TRANSFORM:</b> ${cs.textTransform}<br>
             <b style="color: #fff">OPACITY:</b> ${cs.opacity}<br>
-            <b style="color: #fff">DISPLAY:</b> ${cs.display}
+            <b style="color: #fff">FILHOS (Max 3):</b><br>
+            ${childrenInfo.join('') || '<div style="padding-left: 10px; color: #666;">Nenhum filho</div>'}
         `;
     };
 
