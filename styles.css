@@ -13,6 +13,24 @@
 * {
     color: #e0e0e0 !important;
     -webkit-text-fill-color: #e0e0e0 !important;
+    caret-color: #ffffff !important;
+}
+
+/* =====================================================
+   REGRA PARA TEXTO DIGITADO (máxima prioridade)
+   Cobre: input, textarea, contenteditable, role=textbox
+   ===================================================== */
+input,
+textarea,
+[contenteditable],
+[contenteditable="true"],
+[contenteditable=""],
+[role="textbox"],
+.v-field__input,
+.dx-texteditor-input {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
 }
 
 /* =====================================================

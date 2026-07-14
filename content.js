@@ -95,8 +95,9 @@ function processElement(el) {
 
 // Força TODOS os inputs/textareas para texto branco (independente do framework)
 function forceInputColors(root) {
+    const sel = 'input, textarea, [contenteditable], [role="textbox"], .dx-texteditor-input, .v-field__input';
     const inputs = (root.querySelectorAll || (() => []))
-        .call(root, 'input, textarea, [contenteditable="true"], .dx-texteditor-input');
+        .call(root, sel);
     for (const el of inputs) {
         el.style.setProperty('color', '#ffffff', 'important');
         el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
